@@ -1,47 +1,55 @@
 #include <Arduino.h>
-#include <Button.h>
+#include "PinDefinitions.h"
+#include "Button.h"
+#include "EventManager.h"
 
-constexpr uint8_t NUM_BUTTONS = 9;
+// ------------------ BOTONES ------------------
+Button btn1(Pins::BTN1);
+Button btn2(Pins::BTN2);
+Button btn3(Pins::BTN3);
+Button btn4(Pins::BTN4);
+Button btn5(Pins::BTN5);
+Button btn6(Pins::BTN6);
+Button btn7(Pins::BTN7);
+Button btn8(Pins::BTN8);
+Button btn9(Pins::BTN9);
 
-Button buttons[NUM_BUTTONS] = {
-    Button(4),
-    Button(5),
-    Button(6),
-    Button(7),
-    Button(15),
-    Button(16),
-    Button(17),
-    Button(18),
-    Button(8)
+Button* buttons[] = {
+    &btn1, &btn2, &btn3,
+    &btn4, &btn5, &btn6,
+    &btn7, &btn8, &btn9
 };
 
-void setup()
-{
+EventManager eventManager;
+
+const int NUM_BUTTONS = 9;
+
+// ------------------ SETUP ------------------
+void setup() {
     Serial.begin(115200);
-    delay(1000);
 
-    Serial.println();
-    Serial.println("=================================");
-    Serial.println(" MacroPad - Button Test");
-    Serial.println("=================================");
-
-    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
-    {
-        buttons[i].begin();
+    for (int i = 0; i < NUM_BUTTONS; i++) {
+        buttons[i]->begin();
     }
+
+    eventManager.begin();
+
+    Serial.println("Macropad listo.");
 }
 
-void loop()
-{
-    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
-    {
-        buttons[i].update();
+// ------------------ LOOP ------------------
+void loop() {
 
-        if (buttons[i].isPressed())
-        {
-            Serial.print("Button ");
-            Serial.print(i + 1);
-            Serial.println(" Pressed");
-        }
+    for (int i = 0; i < NUM_BUTTONS; i++) {
+        buttons[i]->update();
+
+        bool state = buttons[i]->isPressed(); 
+        // IMPORTANTE: aquí usamos estado estable
+
+        eventManager.registerButton(i, state);
     }
+
+    eventManager.update();
+
+    delay(5);
 }

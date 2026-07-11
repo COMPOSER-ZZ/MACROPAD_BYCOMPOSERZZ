@@ -4,9 +4,12 @@ Button::Button(uint8_t pin)
 {
     this->pin = pin;
 
-    lastState = HIGH;
-    currentState = HIGH;
+    stableState = HIGH;
+    lastReading = HIGH;
+
     pressedEvent = false;
+    releasedEvent = false;
+
     lastDebounceTime = 0;
 }
 
@@ -17,14 +20,33 @@ void Button::begin()
 
 void Button::update()
 {
-    currentState = digitalRead(pin);
+    bool reading = digitalRead(pin);
 
-    if (lastState == HIGH && currentState == LOW)
+    // Si cambió la lectura física, reiniciamos el temporizador
+    if (reading != lastReading)
     {
-        pressedEvent = true;
+        lastDebounceTime = millis();
+        lastReading = reading;
     }
 
-    lastState = currentState;
+    // Si la lectura permanece estable durante el tiempo de debounce
+    if ((millis() - lastDebounceTime) >= debounceDelay)
+    {
+        // Solo actuamos si el estado estable realmente cambió
+        if (stableState != reading)
+        {
+            stableState = reading;
+
+            if (stableState == LOW)
+            {
+                pressedEvent = true;
+            }
+            else
+            {
+                releasedEvent = true;
+            }
+        }
+    }
 }
 
 bool Button::isPressed()
@@ -32,6 +54,17 @@ bool Button::isPressed()
     if (pressedEvent)
     {
         pressedEvent = false;
+        return true;
+    }
+
+    return false;
+}
+
+bool Button::isReleased()
+{
+    if (releasedEvent)
+    {
+        releasedEvent = false;
         return true;
     }
 

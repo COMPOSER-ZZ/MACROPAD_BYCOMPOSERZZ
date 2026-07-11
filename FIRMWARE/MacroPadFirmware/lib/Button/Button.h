@@ -8,9 +8,11 @@ class Button
 private:
     uint8_t pin;
 
-    bool lastState;
-    bool currentState;
+    bool stableState;      // Estado confirmado
+    bool lastReading;      // Última lectura física
+
     bool pressedEvent;
+    bool releasedEvent;
 
     unsigned long lastDebounceTime;
     static const unsigned long debounceDelay = 20;
@@ -22,6 +24,7 @@ public:
     void update();
 
     bool isPressed();
+    bool isReleased();
 };
 
 #endif
