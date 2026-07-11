@@ -2,7 +2,7 @@
 #define EVENT_MANAGER_H
 
 #include <Arduino.h>
-#include "ButtonEvent.h"
+#include "EventListener.h"
 
 class EventManager
 {
@@ -27,6 +27,8 @@ private:
     bool longPressSent[NUM_BUTTONS];
 
     static const unsigned long LONG_PRESS_TIME = 600;
+
+    EventListener* listener = nullptr;
 };
 
 #endif
