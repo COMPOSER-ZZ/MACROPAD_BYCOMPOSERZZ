@@ -6,11 +6,13 @@ void EventManager::begin()
 
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
+
         buttonDown[i] = false;
 
         pressTime[i] = 0;
 
         longPressSent[i] = false;
+
     }
 
 }
@@ -33,7 +35,6 @@ void EventManager::update()
             {
 
                 longPressSent[i] = true;
-
 
                 emitEvent(i, ButtonEvent::LONG_PRESS);
 

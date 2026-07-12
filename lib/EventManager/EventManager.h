@@ -2,6 +2,7 @@
 #define EVENT_MANAGER_H
 
 #include <Arduino.h>
+#include "ButtonEvent.h"
 #include "EventListener.h"
 
 
@@ -26,6 +27,7 @@ public:
 private:
 
     static const uint8_t NUM_BUTTONS = 15;
+
 
     bool buttonDown[NUM_BUTTONS];
 

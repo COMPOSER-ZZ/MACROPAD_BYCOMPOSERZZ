@@ -3,10 +3,12 @@
 
 enum class ButtonEvent
 {
-    PRESSED,
-    RELEASED,
+    PRESS,
+    RELEASE,
     CLICK,
-    LONG_PRESS
+    DOUBLE_CLICK,
+    LONG_PRESS,
+    HOLD_REPEAT
 };
 
 #endif

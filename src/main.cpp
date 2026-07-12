@@ -1,10 +1,18 @@
 #include <Arduino.h>
 
+#include "USB.h"
+#include "USBHIDKeyboard.h"
+
 #include "PinDefinitions.h"
 #include "Button.h"
 #include "EventManager.h"
 #include "EventListener.h"
+#include "Profile.h"
+#include "ActionExecutor.h"
 
+//-------------------- USB HID --------------------
+
+USBHIDKeyboard Keyboard;
 
 //-------------------- BOTONES --------------------
 
@@ -25,7 +33,6 @@ Button btn12(Pins::BTN12);
 Button btn13(Pins::BTN13);
 Button btn14(Pins::BTN14);
 Button btn15(Pins::BTN15);
-
 
 Button* buttons[] =
 {
@@ -48,32 +55,36 @@ Button* buttons[] =
     &btn15
 };
 
-
 const uint8_t NUM_BUTTONS = sizeof(buttons) / sizeof(buttons[0]);
 
-
-//-------------------- EVENTOS --------------------
+//-------------------- MÓDULOS --------------------
 
 EventManager eventManager;
-
 EventListener eventListener;
 
+Profile profile;
+ActionExecutor actionExecutor;
 
 //-------------------- SETUP --------------------
 
 void setup()
 {
-    
     Serial.begin(115200);
+
+    USB.begin();
+    Keyboard.begin();
 
     delay(2000);
 
+    profile.begin();
+
+    actionExecutor.setKeyboard(&Keyboard);
+
+    eventListener.setProfile(&profile);
+    eventListener.setExecutor(&actionExecutor);
 
     eventManager.begin();
-
-    // Conectar EventManager con EventListener
     eventManager.setListener(&eventListener);
-
 
     Serial.println();
     Serial.println("=================================");
@@ -81,64 +92,41 @@ void setup()
     Serial.println("=================================");
     Serial.println("Iniciando...");
 
-
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-
         buttons[i]->begin();
-
 
         Serial.print("Boton ");
         Serial.print(i + 1);
         Serial.println(" inicializado");
-
     }
 
-
     Serial.println();
-
     Serial.println("Setup terminado.");
-
     Serial.println("Esperando pulsaciones...");
-
     Serial.println();
-
 }
-
-
 
 //-------------------- LOOP --------------------
 
 void loop()
 {
-
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-
         buttons[i]->update();
-
 
         if (buttons[i]->isPressed())
         {
-
             eventManager.onPress(i);
-
         }
-
 
         if (buttons[i]->isReleased())
         {
-
             eventManager.onRelease(i);
-
         }
-
     }
-
 
     eventManager.update();
 
-
     delay(1);
-
 }

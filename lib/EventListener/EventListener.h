@@ -3,25 +3,26 @@
 
 #include <Arduino.h>
 
-
-enum class ButtonEvent
-{
-    PRESS,
-    RELEASE,
-    CLICK,
-    DOUBLE_CLICK,
-    LONG_PRESS
-};
-
+#include "ButtonEvent.h"
+#include "Profile.h"
+#include "ActionExecutor.h"
 
 class EventListener
 {
-
 public:
+
+    void setProfile(Profile* profile);
+
+    void setExecutor(ActionExecutor* executor);
 
     void handle(uint8_t buttonID, ButtonEvent event);
 
-};
+private:
 
+    Profile* profile = nullptr;
+
+    ActionExecutor* executor = nullptr;
+
+};
 
 #endif

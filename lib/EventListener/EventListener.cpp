@@ -1,12 +1,20 @@
 #include "EventListener.h"
 
+void EventListener::setProfile(Profile* profile)
+{
+    this->profile = profile;
+}
+
+void EventListener::setExecutor(ActionExecutor* executor)
+{
+    this->executor = executor;
+}
 
 void EventListener::handle(uint8_t buttonID, ButtonEvent event)
 {
 
     Serial.print("BTN ");
     Serial.print(buttonID);
-
 
     switch(event)
     {
@@ -29,6 +37,13 @@ void EventListener::handle(uint8_t buttonID, ButtonEvent event)
 
             Serial.println(" CLICK");
 
+            if(profile != nullptr && executor != nullptr)
+            {
+                Action action = profile->getAction(buttonID - 1);
+
+                executor->execute(action);
+            }
+
             break;
 
 
@@ -42,6 +57,13 @@ void EventListener::handle(uint8_t buttonID, ButtonEvent event)
         case ButtonEvent::LONG_PRESS:
 
             Serial.println(" LONG PRESS");
+
+            break;
+
+
+        case ButtonEvent::HOLD_REPEAT:
+
+            Serial.println(" HOLD REPEAT");
 
             break;
 
