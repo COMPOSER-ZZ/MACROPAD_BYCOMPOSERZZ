@@ -4,8 +4,9 @@
 #include <Arduino.h>
 
 #include "ButtonEvent.h"
-#include "Profile.h"
-#include "ActionExecutor.h"
+
+class Profile;
+class ActionExecutor;
 
 class EventListener
 {

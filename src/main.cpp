@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include "EncyKEYpedia.h"
 #include "USB.h"
 #include "USBHIDKeyboard.h"
 
@@ -105,6 +105,12 @@ void setup()
     Serial.println("Setup terminado.");
     Serial.println("Esperando pulsaciones...");
     Serial.println();
+
+
+
+    KeyCode test = KeyCode::NUM_5;
+
+    Serial.println((int)test);
 }
 
 //-------------------- LOOP --------------------

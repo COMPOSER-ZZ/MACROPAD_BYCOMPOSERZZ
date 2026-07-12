@@ -1,5 +1,7 @@
 #include "EventListener.h"
 
+#include "Profile.h"
+#include "ActionExecutor.h"
 void EventListener::setProfile(Profile* profile)
 {
     this->profile = profile;
