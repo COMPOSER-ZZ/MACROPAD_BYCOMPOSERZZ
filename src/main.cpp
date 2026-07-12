@@ -69,50 +69,60 @@ ActionExecutor actionExecutor;
 
 void setup()
 {
+    //-------------------- SERIAL --------------------
+
     Serial.begin(115200);
 
-   USB.begin();
-Keyboard.begin();
+    //-------------------- USB HID --------------------
 
-delay(3000);
+    USB.begin();
 
-Keyboard.print("HOLA");
+    Keyboard.begin();
+
+    delay(3000);
+
+    // Prueba de conexión
+    Keyboard.print("HOLA");
+    Keyboard.write(KEY_RETURN);
+
+    //-------------------- INICIALIZAR BOTONES --------------------
+
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+    {
+        buttons[i]->begin();
+    }
+
+    //-------------------- EVENT MANAGER --------------------
+
+    eventManager.begin();
+
+    //-------------------- PROFILE --------------------
 
     profile.begin();
 
+    //-------------------- ACTION EXECUTOR --------------------
+
     actionExecutor.setKeyboard(&Keyboard);
 
+    //-------------------- EVENT LISTENER --------------------
+
     eventListener.setProfile(&profile);
+
     eventListener.setExecutor(&actionExecutor);
 
-    eventManager.begin();
+    //-------------------- CONECTAR EVENT MANAGER --------------------
+
     eventManager.setListener(&eventListener);
+
+    //-------------------- MENSAJES --------------------
 
     Serial.println();
     Serial.println("=================================");
     Serial.println("   MACROPAD BY COMPOSERZZ");
     Serial.println("=================================");
-    Serial.println("Iniciando...");
-
-    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
-    {
-        buttons[i]->begin();
-
-        Serial.print("Boton ");
-        Serial.print(i + 1);
-        Serial.println(" inicializado");
-    }
-
-    Serial.println();
     Serial.println("Setup terminado.");
     Serial.println("Esperando pulsaciones...");
     Serial.println();
-
-
-
- 
-
-
 }
 
 //-------------------- LOOP --------------------

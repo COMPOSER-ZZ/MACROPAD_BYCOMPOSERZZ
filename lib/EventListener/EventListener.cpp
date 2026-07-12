@@ -41,7 +41,7 @@ void EventListener::handle(uint8_t buttonID, ButtonEvent event)
 
             if(profile != nullptr && executor != nullptr)
             {
-                Action action = profile->getAction(buttonID - 1);
+                Action action = profile->getAction(buttonID);
 
                 executor->execute(action);
             }

@@ -1,113 +1,114 @@
 #include "EventManager.h"
 
-
 void EventManager::begin()
 {
-
-    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+    for(uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-
-        buttonDown[i] = false;
-
-        pressTime[i] = 0;
-
-        longPressSent[i] = false;
-
+        buttons[i] = ButtonState();
     }
-
 }
-
-
 
 void EventManager::update()
 {
-
     unsigned long now = millis();
 
-
-    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+    for(uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
+        //----------------------------------------------------
+        // LONG PRESS + HOLD REPEAT
+        //----------------------------------------------------
 
-        if (buttonDown[i] && !longPressSent[i])
+        if(buttons[i].pressed)
         {
-
-            if (now - pressTime[i] >= LONG_PRESS_TIME)
+            if(!buttons[i].longPressSent)
             {
+                if(now - buttons[i].pressTime >= LONG_PRESS_TIME)
+                {
+                    buttons[i].longPressSent = true;
 
-                longPressSent[i] = true;
+                    buttons[i].lastRepeatTime = now;
 
-                emitEvent(i, ButtonEvent::LONG_PRESS);
-
+                    emitEvent(i, ButtonEvent::LONG_PRESS);
+                }
             }
+            else
+            {
+                if(now - buttons[i].lastRepeatTime >= HOLD_REPEAT_TIME)
+                {
+                    buttons[i].lastRepeatTime = now;
 
+                    emitEvent(i, ButtonEvent::HOLD_REPEAT);
+                }
+            }
         }
 
+        //----------------------------------------------------
+        // CLICK
+        //----------------------------------------------------
+
+        if(buttons[i].waitingDoubleClick)
+        {
+            if(now - buttons[i].releaseTime >= DOUBLE_CLICK_TIME)
+            {
+                buttons[i].waitingDoubleClick = false;
+
+                emitEvent(i, ButtonEvent::CLICK);
+            }
+        }
     }
-
 }
-
-
 
 void EventManager::onPress(uint8_t id)
 {
+    //----------------------------------------------------
+    // ¿Es el segundo click?
+    //----------------------------------------------------
 
-    buttonDown[id] = true;
+    if(buttons[id].waitingDoubleClick)
+    {
+        buttons[id].waitingDoubleClick = false;
 
+        emitEvent(id, ButtonEvent::DOUBLE_CLICK);
+    }
 
-    pressTime[id] = millis();
+    buttons[id].pressed = true;
 
+    buttons[id].pressTime = millis();
 
-    longPressSent[id] = false;
+    buttons[id].longPressSent = false;
 
+    buttons[id].lastRepeatTime = 0;
 
     emitEvent(id, ButtonEvent::PRESS);
-
 }
-
-
 
 void EventManager::onRelease(uint8_t id)
 {
-
     emitEvent(id, ButtonEvent::RELEASE);
 
+    buttons[id].pressed = false;
 
-    if (buttonDown[id])
-    {
+    //----------------------------------------------------
+    // Si hubo LONG_PRESS no existe CLICK
+    //----------------------------------------------------
 
-        buttonDown[id] = false;
+    if(buttons[id].longPressSent)
+        return;
 
+    buttons[id].releaseTime = millis();
 
-        if (!longPressSent[id])
-        {
-
-            emitEvent(id, ButtonEvent::CLICK);
-
-        }
-
-    }
-
+    buttons[id].waitingDoubleClick = true;
 }
-
-
 
 void EventManager::emitEvent(uint8_t id, ButtonEvent event)
 {
-
-    if(listener)
+    if(listener != nullptr)
     {
-
-        listener->handle(id + 1, event);
-
+        listener->handle(id, event);
     }
-
 }
-
-
 
 void EventManager::setListener(EventListener* listener)
 {
-
     this->listener = listener;
-
 }
