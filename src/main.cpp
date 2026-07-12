@@ -71,10 +71,12 @@ void setup()
 {
     Serial.begin(115200);
 
-    USB.begin();
-    Keyboard.begin();
+   USB.begin();
+Keyboard.begin();
 
-    delay(2000);
+delay(3000);
+
+Keyboard.print("HOLA");
 
     profile.begin();
 
@@ -108,9 +110,9 @@ void setup()
 
 
 
-    KeyCode test = KeyCode::NUM_5;
+ 
 
-    Serial.println((int)test);
+
 }
 
 //-------------------- LOOP --------------------

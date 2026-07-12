@@ -3,61 +3,17 @@
 
 #include <Arduino.h>
 
+#include "KeyCode.h"
+#include "KeyInfo.h"
 
-enum class KeyCode : uint16_t
+class EncyKEYpedia
 {
+public:
 
-    NONE = 0,
+    static const char* getName(KeyCode key);
 
-
-    //========================
-    // LETRAS
-    //========================
-
-    A = 1,
-    B,
-    C,
-    D,
-    E,
-    F,
-    G,
-    H,
-    I,
-    J,
-    K,
-    L,
-    M,
-    N,
-    O,
-    P,
-    Q,
-    R,
-    S,
-    T,
-    U,
-    V,
-    W,
-    X,
-    Y,
-    Z,
-
-
-    //========================
-    // NUMEROS
-    //========================
-
-    NUM_0,
-    NUM_1,
-    NUM_2,
-    NUM_3,
-    NUM_4,
-    NUM_5,
-    NUM_6,
-    NUM_7,
-    NUM_8,
-    NUM_9
+    static const KeyInfo* getInfo(KeyCode key);
 
 };
-
 
 #endif
