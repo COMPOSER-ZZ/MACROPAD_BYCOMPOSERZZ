@@ -9,6 +9,7 @@ enum class ButtonEvent
     PRESS,
     RELEASE,
     CLICK,
+    DOUBLE_CLICK,
     LONG_PRESS
 };
 

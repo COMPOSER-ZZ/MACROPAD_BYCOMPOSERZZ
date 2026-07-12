@@ -1,0 +1,13 @@
+| GPIO   | Botón | Acción         |
+| ------ | ----- | -------------- |
+| GPIO4  | BTN1  | Tecla `1`      |
+| GPIO5  | BTN2  | Tecla `4`      |
+| GPIO6  | BTN3  | Tecla `7`      |
+| GPIO15 | BTN4  | CTRL + WIN + ← |
+| GPIO16 | BTN5  | Tecla `2`      |
+| GPIO17 | BTN6  | Tecla `5`      |
+| GPIO18 | BTN7  | Tecla `8`      |
+| GPIO46 | BTN8  | Tecla `3`      |
+| GPIO9  | BTN9  | Tecla `6`      |
+| GPIO10 | BTN10 | Tecla `9`      |
+| GPIO12 | BTN15 | CTRL + WIN + → |

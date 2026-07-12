@@ -4,17 +4,23 @@
 #include <Arduino.h>
 #include "EventListener.h"
 
+
 class EventManager
 {
+
 public:
 
     void begin();
+
     void update();
 
     void onPress(uint8_t id);
+
     void onRelease(uint8_t id);
 
     void emitEvent(uint8_t id, ButtonEvent event);
+
+    void setListener(EventListener* listener);
 
 
 private:
@@ -24,11 +30,16 @@ private:
     bool buttonDown[NUM_BUTTONS];
 
     unsigned long pressTime[NUM_BUTTONS];
+
     bool longPressSent[NUM_BUTTONS];
+
 
     static const unsigned long LONG_PRESS_TIME = 600;
 
+
     EventListener* listener = nullptr;
+
 };
+
 
 #endif
