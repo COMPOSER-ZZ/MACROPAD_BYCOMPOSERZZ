@@ -2,113 +2,192 @@
 
 void EventManager::begin()
 {
-    for(uint8_t i = 0; i < NUM_BUTTONS; i++)
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-        buttons[i] = ButtonState();
+        configs[i] = InteractionConfig();
+        contexts[i] = ButtonContext();
     }
 }
 
 void EventManager::update()
 {
-    unsigned long now = millis();
+    const unsigned long now = millis();
 
-    for(uint8_t i = 0; i < NUM_BUTTONS; i++)
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-        //----------------------------------------------------
-        // LONG PRESS + HOLD REPEAT
-        //----------------------------------------------------
+        ButtonContext& context = contexts[i];
+        const InteractionConfig& config = configs[i];
 
-        if(buttons[i].pressed)
+        switch (context.state)
         {
-            if(!buttons[i].longPressSent)
-            {
-                if(now - buttons[i].pressTime >= LONG_PRESS_TIME)
-                {
-                    buttons[i].longPressSent = true;
+            case InteractionState::PRESSED:
 
-                    buttons[i].lastRepeatTime = now;
+                if (
+                    config.enableLongPress &&
+                    now - context.pressedAt >= config.longPressTime
+                )
+                {
+                    context.state = InteractionState::LONG_HOLDING;
+                    context.lastRepeatAt = now;
 
                     emitEvent(i, ButtonEvent::LONG_PRESS);
                 }
-            }
-            else
-            {
-                if(now - buttons[i].lastRepeatTime >= HOLD_REPEAT_TIME)
+
+                break;
+
+            case InteractionState::LONG_HOLDING:
+
+                if (
+                    config.enableHoldRepeat &&
+                    now - context.lastRepeatAt >= config.repeatTime
+                )
                 {
-                    buttons[i].lastRepeatTime = now;
+                    context.lastRepeatAt = now;
 
                     emitEvent(i, ButtonEvent::HOLD_REPEAT);
                 }
-            }
-        }
 
-        //----------------------------------------------------
-        // CLICK
-        //----------------------------------------------------
+                break;
 
-        if(buttons[i].waitingDoubleClick)
-        {
-            if(now - buttons[i].releaseTime >= DOUBLE_CLICK_TIME)
-            {
-                buttons[i].waitingDoubleClick = false;
+            case InteractionState::WAIT_SECOND_CLICK:
 
-                emitEvent(i, ButtonEvent::CLICK);
-            }
+                if (now - context.releasedAt >= config.doubleClickTime)
+                {
+                    context.state = InteractionState::IDLE;
+
+                    if (config.enableClick)
+                    {
+                        emitEvent(i, ButtonEvent::CLICK);
+                    }
+                }
+
+                break;
+
+            default:
+
+                break;
         }
     }
 }
 
 void EventManager::onPress(uint8_t id)
 {
-    //----------------------------------------------------
-    // ¿Es el segundo click?
-    //----------------------------------------------------
-
-    if(buttons[id].waitingDoubleClick)
+    if (!isValidButton(id))
     {
-        buttons[id].waitingDoubleClick = false;
-
-        emitEvent(id, ButtonEvent::DOUBLE_CLICK);
+        return;
     }
 
-    buttons[id].pressed = true;
+    ButtonContext& context = contexts[id];
 
-    buttons[id].pressTime = millis();
+    switch (context.state)
+    {
+        case InteractionState::IDLE:
 
-    buttons[id].longPressSent = false;
+            context.state = InteractionState::PRESSED;
+            context.pressedAt = millis();
 
-    buttons[id].lastRepeatTime = 0;
+            emitEvent(id, ButtonEvent::PRESS);
 
-    emitEvent(id, ButtonEvent::PRESS);
+            break;
+
+        case InteractionState::WAIT_SECOND_CLICK:
+
+            context.state = InteractionState::SECOND_PRESSED;
+            context.pressedAt = millis();
+
+            emitEvent(id, ButtonEvent::PRESS);
+
+            break;
+
+        default:
+
+            break;
+    }
 }
 
 void EventManager::onRelease(uint8_t id)
 {
-    emitEvent(id, ButtonEvent::RELEASE);
-
-    buttons[id].pressed = false;
-
-    //----------------------------------------------------
-    // Si hubo LONG_PRESS no existe CLICK
-    //----------------------------------------------------
-
-    if(buttons[id].longPressSent)
-        return;
-
-    buttons[id].releaseTime = millis();
-
-    buttons[id].waitingDoubleClick = true;
-}
-
-void EventManager::emitEvent(uint8_t id, ButtonEvent event)
-{
-    if(listener != nullptr)
+    if (!isValidButton(id))
     {
-        listener->handle(id, event);
+        return;
+    }
+
+    ButtonContext& context = contexts[id];
+    const InteractionConfig& config = configs[id];
+
+    switch (context.state)
+    {
+        case InteractionState::PRESSED:
+
+            emitEvent(id, ButtonEvent::RELEASE);
+
+            if (config.enableDoubleClick)
+            {
+                context.state = InteractionState::WAIT_SECOND_CLICK;
+                context.releasedAt = millis();
+            }
+            else
+            {
+                context.state = InteractionState::IDLE;
+
+                if (config.enableClick)
+                {
+                    emitEvent(id, ButtonEvent::CLICK);
+                }
+            }
+
+            break;
+
+        case InteractionState::LONG_HOLDING:
+
+            context.state = InteractionState::IDLE;
+
+            emitEvent(id, ButtonEvent::RELEASE);
+
+            break;
+
+        case InteractionState::SECOND_PRESSED:
+
+            context.state = InteractionState::IDLE;
+
+            emitEvent(id, ButtonEvent::RELEASE);
+            emitEvent(id, ButtonEvent::DOUBLE_CLICK);
+
+            break;
+
+        default:
+
+            break;
     }
 }
 
 void EventManager::setListener(EventListener* listener)
 {
     this->listener = listener;
+}
+
+void EventManager::setInteractionConfig(
+    uint8_t id,
+    const InteractionConfig& config
+)
+{
+    if (!isValidButton(id))
+    {
+        return;
+    }
+
+    configs[id] = config;
+}
+
+bool EventManager::isValidButton(uint8_t id) const
+{
+    return id < NUM_BUTTONS;
+}
+
+void EventManager::emitEvent(uint8_t id, ButtonEvent event)
+{
+    if (listener != nullptr)
+    {
+        listener->handle(id, event);
+    }
 }

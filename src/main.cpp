@@ -99,6 +99,13 @@ void setup()
     //-------------------- PROFILE --------------------
 
     profile.begin();
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+{
+    eventManager.setInteractionConfig(
+        i,
+        profile.getInteractionConfig(i)
+    );
+}
 
     //-------------------- ACTION EXECUTOR --------------------
 
