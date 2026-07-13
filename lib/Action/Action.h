@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 
+#include "KeyCode.h"
+
 enum class ActionType
 {
     NONE,
@@ -20,7 +22,7 @@ struct Action
 {
     ActionType type = ActionType::NONE;
 
-    uint8_t data[8] = {0};
+    KeyCode key = KeyCode::NONE;
 };
 
 #endif

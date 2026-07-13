@@ -1,5 +1,14 @@
 #include "Profile.h"
 
+namespace
+{
+    void setKeyAction(Action& action, KeyCode key)
+    {
+        action.type = ActionType::KEYBOARD_KEY;
+        action.key = key;
+    }
+}
+
 void Profile::begin()
 {
     for (uint8_t button = 0; button < NUM_BUTTONS; button++)
@@ -79,93 +88,112 @@ void Profile::begin()
     interactionConfigs[12] = clickOnly;
 
     // BTN 1: PRESS.
-    actions[0][eventToIndex(ButtonEvent::PRESS)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[0][eventToIndex(ButtonEvent::PRESS)].data[0] = '1';
+    setKeyAction(
+        actions[0][eventToIndex(ButtonEvent::PRESS)],
+        KeyCode::NUM_1
+    );
 
     // BTN 2: CLICK.
-    actions[1][eventToIndex(ButtonEvent::CLICK)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[1][eventToIndex(ButtonEvent::CLICK)].data[0] = '2';
+    setKeyAction(
+        actions[1][eventToIndex(ButtonEvent::CLICK)],
+        KeyCode::NUM_2
+    );
 
     // BTN 3: DOUBLE_CLICK.
-    actions[2][eventToIndex(ButtonEvent::DOUBLE_CLICK)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[2][eventToIndex(ButtonEvent::DOUBLE_CLICK)].data[0] = '3';
+    setKeyAction(
+        actions[2][eventToIndex(ButtonEvent::DOUBLE_CLICK)],
+        KeyCode::NUM_3
+    );
 
     // BTN 4: LONG_PRESS.
-    actions[3][eventToIndex(ButtonEvent::LONG_PRESS)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[3][eventToIndex(ButtonEvent::LONG_PRESS)].data[0] = '4';
+    setKeyAction(
+        actions[3][eventToIndex(ButtonEvent::LONG_PRESS)],
+        KeyCode::NUM_4
+    );
 
     // BTN 5: LONG_PRESS y HOLD_REPEAT.
-    actions[4][eventToIndex(ButtonEvent::LONG_PRESS)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[4][eventToIndex(ButtonEvent::LONG_PRESS)].data[0] = '5';
+    setKeyAction(
+        actions[4][eventToIndex(ButtonEvent::LONG_PRESS)],
+        KeyCode::NUM_5
+    );
 
-    actions[4][eventToIndex(ButtonEvent::HOLD_REPEAT)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[4][eventToIndex(ButtonEvent::HOLD_REPEAT)].data[0] = 'r';
+    setKeyAction(
+        actions[4][eventToIndex(ButtonEvent::HOLD_REPEAT)],
+        KeyCode::R
+    );
 
     // BTN 6: CLICK o DOUBLE_CLICK.
-    actions[5][eventToIndex(ButtonEvent::CLICK)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[5][eventToIndex(ButtonEvent::CLICK)].data[0] = '6';
+    setKeyAction(
+        actions[5][eventToIndex(ButtonEvent::CLICK)],
+        KeyCode::NUM_6
+    );
 
-    actions[5][eventToIndex(ButtonEvent::DOUBLE_CLICK)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[5][eventToIndex(ButtonEvent::DOUBLE_CLICK)].data[0] = 'D';
+    setKeyAction(
+        actions[5][eventToIndex(ButtonEvent::DOUBLE_CLICK)],
+        KeyCode::D
+    );
 
     // BTN 7: PRESS y RELEASE.
-    actions[6][eventToIndex(ButtonEvent::PRESS)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[6][eventToIndex(ButtonEvent::PRESS)].data[0] = '7';
+    setKeyAction(
+        actions[6][eventToIndex(ButtonEvent::PRESS)],
+        KeyCode::NUM_7
+    );
 
-    actions[6][eventToIndex(ButtonEvent::RELEASE)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[6][eventToIndex(ButtonEvent::RELEASE)].data[0] = 'R';
+    setKeyAction(
+        actions[6][eventToIndex(ButtonEvent::RELEASE)],
+        KeyCode::R
+    );
 
     // BTN 8: CLICK o LONG_PRESS.
-    actions[7][eventToIndex(ButtonEvent::CLICK)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[7][eventToIndex(ButtonEvent::CLICK)].data[0] = '8';
+    setKeyAction(
+        actions[7][eventToIndex(ButtonEvent::CLICK)],
+        KeyCode::NUM_8
+    );
 
-    actions[7][eventToIndex(ButtonEvent::LONG_PRESS)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[7][eventToIndex(ButtonEvent::LONG_PRESS)].data[0] = 'L';
+    setKeyAction(
+        actions[7][eventToIndex(ButtonEvent::LONG_PRESS)],
+        KeyCode::L
+    );
 
     // BTN 9: DOUBLE_CLICK lento.
-    actions[8][eventToIndex(ButtonEvent::DOUBLE_CLICK)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[8][eventToIndex(ButtonEvent::DOUBLE_CLICK)].data[0] = '9';
+    setKeyAction(
+        actions[8][eventToIndex(ButtonEvent::DOUBLE_CLICK)],
+        KeyCode::NUM_9
+    );
 
     // BTN 10: LONG_PRESS lento.
-    actions[9][eventToIndex(ButtonEvent::LONG_PRESS)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[9][eventToIndex(ButtonEvent::LONG_PRESS)].data[0] = '0';
+    setKeyAction(
+        actions[9][eventToIndex(ButtonEvent::LONG_PRESS)],
+        KeyCode::NUM_0
+    );
 
     // BTN 11: LONG_PRESS con repetición rápida.
-    actions[10][eventToIndex(ButtonEvent::LONG_PRESS)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[10][eventToIndex(ButtonEvent::LONG_PRESS)].data[0] = 'H';
+    setKeyAction(
+        actions[10][eventToIndex(ButtonEvent::LONG_PRESS)],
+        KeyCode::H
+    );
 
-    actions[10][eventToIndex(ButtonEvent::HOLD_REPEAT)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[10][eventToIndex(ButtonEvent::HOLD_REPEAT)].data[0] = '+';
+    setKeyAction(
+        actions[10][eventToIndex(ButtonEvent::HOLD_REPEAT)],
+        KeyCode::H
+    );
 
     // BTN 12: PRESS y RELEASE.
-    actions[11][eventToIndex(ButtonEvent::PRESS)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[11][eventToIndex(ButtonEvent::PRESS)].data[0] = 'A';
+    setKeyAction(
+        actions[11][eventToIndex(ButtonEvent::PRESS)],
+        KeyCode::A
+    );
 
-    actions[11][eventToIndex(ButtonEvent::RELEASE)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[11][eventToIndex(ButtonEvent::RELEASE)].data[0] = 'a';
+    setKeyAction(
+        actions[11][eventToIndex(ButtonEvent::RELEASE)],
+        KeyCode::C
+    );
 
     // BTN 13: CLICK.
-    actions[12][eventToIndex(ButtonEvent::CLICK)].type =
-        ActionType::KEYBOARD_KEY;
-    actions[12][eventToIndex(ButtonEvent::CLICK)].data[0] = 'B';
+    setKeyAction(
+        actions[12][eventToIndex(ButtonEvent::CLICK)],
+        KeyCode::B
+    );
 
     // BTN 14 y BTN 15 quedan sin acción intencionalmente.
 }
