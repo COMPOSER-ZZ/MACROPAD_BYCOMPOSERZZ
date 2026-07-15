@@ -1,4 +1,5 @@
 #include <Arduino.h>
+
 #include "EncyKEYpedia.h"
 #include "USB.h"
 #include "USBHIDKeyboard.h"
@@ -9,6 +10,7 @@
 #include "EventListener.h"
 #include "Profile.h"
 #include "ActionExecutor.h"
+#include "MacroRunner.h"
 
 //-------------------- USB HID --------------------
 
@@ -64,6 +66,7 @@ EventListener eventListener;
 
 Profile profile;
 ActionExecutor actionExecutor;
+MacroRunner macroRunner;
 
 //-------------------- SETUP --------------------
 
@@ -81,10 +84,6 @@ void setup()
 
     delay(3000);
 
-    // Prueba de conexión
-    Keyboard.print("HOLA");
-    Keyboard.write(KEY_RETURN);
-
     //-------------------- INICIALIZAR BOTONES --------------------
 
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
@@ -99,23 +98,28 @@ void setup()
     //-------------------- PROFILE --------------------
 
     profile.begin();
+
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
-{
-    eventManager.setInteractionConfig(
-        i,
-        profile.getInteractionConfig(i)
-    );
-}
+    {
+        eventManager.setInteractionConfig(
+            i,
+            profile.getInteractionConfig(i)
+        );
+    }
 
     //-------------------- ACTION EXECUTOR --------------------
 
     actionExecutor.setKeyboard(&Keyboard);
 
+    //-------------------- MACRO RUNNER --------------------
+
+    macroRunner.setExecutor(&actionExecutor);
+
     //-------------------- EVENT LISTENER --------------------
 
     eventListener.setProfile(&profile);
-
     eventListener.setExecutor(&actionExecutor);
+    eventListener.setMacroRunner(&macroRunner);
 
     //-------------------- CONECTAR EVENT MANAGER --------------------
 
@@ -152,6 +156,8 @@ void loop()
     }
 
     eventManager.update();
+
+    macroRunner.update();
 
     delay(1);
 }

@@ -2,11 +2,63 @@
 
 namespace
 {
+    Action makeKeyAction(KeyCode key)
+    {
+        Action action;
+
+        action.type = ActionType::KEYBOARD_KEY;
+        action.keys[0] = key;
+        action.keyCount = 1;
+
+        return action;
+    }
+
     void setKeyAction(Action& action, KeyCode key)
     {
-        action.type = ActionType::KEYBOARD_KEY;
-        action.key = key;
+        action = makeKeyAction(key);
     }
+
+    void setCombinationAction(
+        Action& action,
+        const KeyCode* keys,
+        uint8_t keyCount
+    )
+    {
+        action = Action();
+
+        if (
+            keys == nullptr ||
+            keyCount == 0 ||
+            keyCount > Action::MAX_KEYS
+        )
+        {
+            return;
+        }
+
+        action.type = ActionType::KEYBOARD_COMBINATION;
+        action.keyCount = keyCount;
+
+        for (uint8_t i = 0; i < keyCount; i++)
+        {
+            action.keys[i] = keys[i];
+        }
+    }
+
+    void setMacroAction(Action& action, uint8_t macroId)
+    {
+        action = Action();
+        action.type = ActionType::MACRO;
+        action.macroId = macroId;
+    }
+
+    const MacroStep helloMacroSteps[] =
+    {
+        { makeKeyAction(KeyCode::H), 120 },
+        { makeKeyAction(KeyCode::O), 120 },
+        { makeKeyAction(KeyCode::L), 120 },
+        { makeKeyAction(KeyCode::A), 120 },
+        { makeKeyAction(KeyCode::ENTER), 0 }
+    };
 }
 
 void Profile::begin()
@@ -20,6 +72,10 @@ void Profile::begin()
             actions[button][event] = Action();
         }
     }
+
+    macros[0].steps = helloMacroSteps;
+    macros[0].stepCount =
+        sizeof(helloMacroSteps) / sizeof(helloMacroSteps[0]);
 
     InteractionConfig pressOnly;
     pressOnly.enableClick = false;
@@ -77,7 +133,7 @@ void Profile::begin()
     interactionConfigs[1] = clickOnly;
     interactionConfigs[2] = doubleClickOnly;
     interactionConfigs[3] = longPressOnly;
-    interactionConfigs[4] = longPressWithRepeat;
+    interactionConfigs[4] = pressOnly;
     interactionConfigs[5] = clickAndDoubleClick;
     interactionConfigs[6] = pressOnly;
     interactionConfigs[7] = clickAndLongPress;
@@ -86,43 +142,48 @@ void Profile::begin()
     interactionConfigs[10] = fastRepeat;
     interactionConfigs[11] = pressOnly;
     interactionConfigs[12] = clickOnly;
+    interactionConfigs[13] = pressOnly;
+    interactionConfigs[14] = pressOnly;
 
-    // BTN 1: PRESS.
+    // BTN1: PRESS.
     setKeyAction(
         actions[0][eventToIndex(ButtonEvent::PRESS)],
         KeyCode::NUM_1
     );
 
-    // BTN 2: CLICK.
+    // BTN2: CLICK.
     setKeyAction(
         actions[1][eventToIndex(ButtonEvent::CLICK)],
         KeyCode::NUM_2
     );
 
-    // BTN 3: DOUBLE_CLICK.
+    // BTN3: DOUBLE_CLICK.
     setKeyAction(
         actions[2][eventToIndex(ButtonEvent::DOUBLE_CLICK)],
         KeyCode::NUM_3
     );
 
-    // BTN 4: LONG_PRESS.
+    // BTN4: LONG_PRESS.
     setKeyAction(
         actions[3][eventToIndex(ButtonEvent::LONG_PRESS)],
         KeyCode::NUM_4
     );
 
-    // BTN 5: LONG_PRESS y HOLD_REPEAT.
-    setKeyAction(
-        actions[4][eventToIndex(ButtonEvent::LONG_PRESS)],
-        KeyCode::NUM_5
+    // BTN5: Ctrl + Win + Flecha izquierda.
+    const KeyCode switchDesktopLeft[] =
+    {
+        KeyCode::LEFT_CTRL,
+        KeyCode::LEFT_GUI,
+        KeyCode::ARROW_LEFT
+    };
+
+    setCombinationAction(
+        actions[4][eventToIndex(ButtonEvent::PRESS)],
+        switchDesktopLeft,
+        sizeof(switchDesktopLeft) / sizeof(switchDesktopLeft[0])
     );
 
-    setKeyAction(
-        actions[4][eventToIndex(ButtonEvent::HOLD_REPEAT)],
-        KeyCode::R
-    );
-
-    // BTN 6: CLICK o DOUBLE_CLICK.
+    // BTN6: CLICK o DOUBLE_CLICK.
     setKeyAction(
         actions[5][eventToIndex(ButtonEvent::CLICK)],
         KeyCode::NUM_6
@@ -133,7 +194,7 @@ void Profile::begin()
         KeyCode::D
     );
 
-    // BTN 7: PRESS y RELEASE.
+    // BTN7: PRESS y RELEASE.
     setKeyAction(
         actions[6][eventToIndex(ButtonEvent::PRESS)],
         KeyCode::NUM_7
@@ -144,7 +205,7 @@ void Profile::begin()
         KeyCode::R
     );
 
-    // BTN 8: CLICK o LONG_PRESS.
+    // BTN8: CLICK o LONG_PRESS.
     setKeyAction(
         actions[7][eventToIndex(ButtonEvent::CLICK)],
         KeyCode::NUM_8
@@ -155,19 +216,19 @@ void Profile::begin()
         KeyCode::L
     );
 
-    // BTN 9: DOUBLE_CLICK lento.
+    // BTN9: DOUBLE_CLICK lento.
     setKeyAction(
         actions[8][eventToIndex(ButtonEvent::DOUBLE_CLICK)],
         KeyCode::NUM_9
     );
 
-    // BTN 10: LONG_PRESS lento.
+    // BTN10: LONG_PRESS lento.
     setKeyAction(
         actions[9][eventToIndex(ButtonEvent::LONG_PRESS)],
         KeyCode::NUM_0
     );
 
-    // BTN 11: LONG_PRESS con repetición rápida.
+    // BTN11: LONG_PRESS con repetición rápida.
     setKeyAction(
         actions[10][eventToIndex(ButtonEvent::LONG_PRESS)],
         KeyCode::H
@@ -178,7 +239,7 @@ void Profile::begin()
         KeyCode::H
     );
 
-    // BTN 12: PRESS y RELEASE.
+    // BTN12: PRESS y RELEASE.
     setKeyAction(
         actions[11][eventToIndex(ButtonEvent::PRESS)],
         KeyCode::A
@@ -189,13 +250,31 @@ void Profile::begin()
         KeyCode::C
     );
 
-    // BTN 13: CLICK.
+    // BTN13: CLICK.
     setKeyAction(
         actions[12][eventToIndex(ButtonEvent::CLICK)],
         KeyCode::B
     );
 
-    // BTN 14 y BTN 15 quedan sin acción intencionalmente.
+    // BTN14: macro "hola" + Enter.
+    setMacroAction(
+        actions[13][eventToIndex(ButtonEvent::PRESS)],
+        0
+    );
+
+    // BTN15: Ctrl + Win + Flecha derecha.
+    const KeyCode switchDesktopRight[] =
+    {
+        KeyCode::LEFT_CTRL,
+        KeyCode::LEFT_GUI,
+        KeyCode::ARROW_RIGHT
+    };
+
+    setCombinationAction(
+        actions[14][eventToIndex(ButtonEvent::PRESS)],
+        switchDesktopRight,
+        sizeof(switchDesktopRight) / sizeof(switchDesktopRight[0])
+    );
 }
 
 Action Profile::getAction(uint8_t buttonID, ButtonEvent event) const
@@ -216,6 +295,16 @@ InteractionConfig Profile::getInteractionConfig(uint8_t buttonID) const
     }
 
     return interactionConfigs[buttonID];
+}
+
+const Macro* Profile::getMacro(uint8_t macroId) const
+{
+    if (macroId >= NUM_MACROS)
+    {
+        return nullptr;
+    }
+
+    return &macros[macroId];
 }
 
 uint8_t Profile::eventToIndex(ButtonEvent event) const

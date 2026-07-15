@@ -20,9 +20,27 @@ enum class ActionType
 
 struct Action
 {
-    ActionType type = ActionType::NONE;
+    static constexpr uint8_t MAX_KEYS = 6;
 
-    KeyCode key = KeyCode::NONE;
+    ActionType type;
+    KeyCode keys[MAX_KEYS];
+    uint8_t keyCount;
+    uint8_t macroId;
+
+    Action()
+        : type(ActionType::NONE),
+          keys{
+              KeyCode::NONE,
+              KeyCode::NONE,
+              KeyCode::NONE,
+              KeyCode::NONE,
+              KeyCode::NONE,
+              KeyCode::NONE
+          },
+          keyCount(0),
+          macroId(0)
+    {
+    }
 };
 
 #endif

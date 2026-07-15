@@ -7,6 +7,7 @@
 
 class Profile;
 class ActionExecutor;
+class MacroRunner;
 
 class EventListener
 {
@@ -16,6 +17,8 @@ public:
 
     void setExecutor(ActionExecutor* executor);
 
+    void setMacroRunner(MacroRunner* macroRunner);
+
     void handle(uint8_t buttonID, ButtonEvent event);
 
 private:
@@ -24,6 +27,7 @@ private:
 
     ActionExecutor* executor = nullptr;
 
+    MacroRunner* macroRunner = nullptr;
 };
 
 #endif

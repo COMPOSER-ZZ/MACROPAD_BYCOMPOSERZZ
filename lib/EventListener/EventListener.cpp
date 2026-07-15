@@ -1,6 +1,7 @@
 #include "EventListener.h"
 
 #include "ActionExecutor.h"
+#include "MacroRunner.h"
 #include "Profile.h"
 
 void EventListener::setProfile(Profile* profile)
@@ -11,6 +12,11 @@ void EventListener::setProfile(Profile* profile)
 void EventListener::setExecutor(ActionExecutor* executor)
 {
     this->executor = executor;
+}
+
+void EventListener::setMacroRunner(MacroRunner* macroRunner)
+{
+    this->macroRunner = macroRunner;
 }
 
 void EventListener::handle(uint8_t buttonID, ButtonEvent event)
@@ -45,12 +51,25 @@ void EventListener::handle(uint8_t buttonID, ButtonEvent event)
             break;
     }
 
-    if (profile == nullptr || executor == nullptr)
+    if (profile == nullptr)
     {
         return;
     }
 
     const Action action = profile->getAction(buttonID, event);
 
-    executor->execute(action);
+    if (action.type == ActionType::MACRO)
+    {
+        if (macroRunner != nullptr)
+        {
+            macroRunner->start(profile->getMacro(action.macroId));
+        }
+
+        return;
+    }
+
+    if (executor != nullptr)
+    {
+        executor->execute(action);
+    }
 }
